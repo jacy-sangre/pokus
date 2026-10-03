@@ -138,7 +138,12 @@
 /* ---------- Base ---------- */
 @layer base {
   html {
-    @apply bg-canvas text-ink font-sans text-body antialiased;
+    @apply bg-canvas;
+  }
+
+  /* Base size goes on body, not html: html's font-size defines 1rem, and every token is in rem. */
+  body {
+    @apply text-ink font-sans text-body antialiased;
   }
 
   /* FocusOnNavigate moves focus to the page h1; it should not draw a ring. */
@@ -166,5 +171,10 @@
 
   .blazor-error-boundary::after {
     content: "Something broke on this part of the page.";
+  }
+
+  /* Rendered by Blazor's <ValidationMessage>, which doesn't take a class parameter. */
+  .validation-message {
+    @apply text-small text-danger;
   }
 }

@@ -1,0 +1,47 @@
+@inherits LayoutComponentBase
+
+@* Split layout for log in / create account: brand panel on the left, form on the right. No sidebar,
+   since nothing behind it is reachable before signing in. Below lg the brand panel is hidden. *@
+<div class="flex min-h-screen bg-canvas">
+    <aside class="hidden w-[560px] shrink-0 flex-col justify-between gap-10 bg-sunken px-14 py-12 lg:flex">
+        <a href="" aria-label="Pokus home"><Wordmark /></a>
+
+        <div class="flex flex-col gap-8">
+            <p class="text-display">Find a technique that fits. Start focusing. Actually learn.</p>
+            <ul class="flex flex-col gap-5">
+                @foreach (var p in Pillars)
+                {
+                    <li class="flex items-start gap-3.5">
+                        <span class="flex size-10 shrink-0 items-center justify-center rounded-md bg-surface text-accent">
+                            <Icon Name="@p.Icon" />
+                        </span>
+                        <span class="flex flex-col gap-0.5">
+                            <span class="font-semibold">@p.Title</span>
+                            <span class="text-small text-muted">@p.Text</span>
+                        </span>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <p class="text-muted">“Five minutes. That’s all we’re asking. Probably.”</p>
+    </aside>
+
+    <main class="flex flex-1 flex-col items-center justify-center px-4 py-10 sm:px-14">
+        <div class="flex w-full max-w-[380px] flex-col gap-6">
+            <a href="" class="lg:hidden" aria-label="Pokus home"><Wordmark /></a>
+            @Body
+        </div>
+    </main>
+</div>
+
+@code {
+    private record Pillar(string Icon, string Title, string Text);
+
+    private static readonly Pillar[] Pillars =
+    [
+        new("book", "Techniques, labeled honestly", "12 focus and study methods, each marked by how well the evidence supports it."),
+        new("timer", "Focus sessions", "A timer linked to a technique and a task. Pause, resume, and a short summary at the end."),
+        new("cards", "Flashcards that come back", "Active recall with optional spaced repetition. AI help is optional too."),
+    ];
+}

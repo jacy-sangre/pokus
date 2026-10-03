@@ -1,0 +1,56 @@
+@page "/register"
+@layout AuthLayout
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<PageTitle>Create account · Pokus</PageTitle>
+
+<div class="flex flex-col gap-1.5">
+    <h1 class="text-title-1">Create your account</h1>
+    <p class="text-muted">Free, and your data stays yours. No streaks, no points.</p>
+</div>
+
+<EditForm Model="model" OnValidSubmit="CreateAccount" novalidate class="flex flex-col gap-6">
+    <DataAnnotationsValidator />
+    <div class="flex flex-col gap-4">
+        <TextField Id="name" Label="Name (optional)" Placeholder="What should we call you?" AutoComplete="nickname" @bind-Value="model.Name" />
+        <TextField Id="email" Label="Email" InputType="email" Placeholder="you@example.com" AutoComplete="email" @bind-Value="model.Email" />
+        <TextField Id="password" Label="Password" Password AutoComplete="new-password" Hint="At least 8 characters." @bind-Value="model.Password" />
+    </div>
+    <Button Type="submit" Class="w-full">Create account</Button>
+    <p class="text-center text-small text-muted">
+        By creating an account you agree that Pokus stores your sessions, decks and settings. Nothing is sold.
+    </p>
+</EditForm>
+
+<hr class="border-line" />
+
+<p class="text-center text-small">
+    <span class="text-muted">Already have an account?</span>
+    <a href="login" class="font-semibold text-accent hover:underline">Log in</a>
+</p>
+
+<p class="flex items-start gap-2 rounded-md bg-sunken px-3 py-2.5 text-small text-muted">
+    <Icon Name="info" Size="16" Class="mt-0.5" />
+    Accounts arrive in a later version. For now, creating one just opens the app and nothing is stored.
+</p>
+
+@code {
+    private readonly RegisterModel model = new();
+
+    private void CreateAccount() => Navigation.NavigateTo("");
+
+    private sealed class RegisterModel
+    {
+        [StringLength(50, ErrorMessage = "Keep it under 50 characters.")]
+        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "Enter your email.")]
+        [EmailAddress(ErrorMessage = "That doesn't look like an email address.")]
+        public string? Email { get; set; }
+
+        [Required(ErrorMessage = "Choose a password.")]
+        [MinLength(8, ErrorMessage = "Use at least 8 characters.")]
+        public string? Password { get; set; }
+    }
+}

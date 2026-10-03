@@ -1,0 +1,51 @@
+@page "/login"
+@layout AuthLayout
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<PageTitle>Log in · Pokus</PageTitle>
+
+<div class="flex flex-col gap-1.5">
+    <h1 class="text-title-1">Welcome back</h1>
+    <p class="text-muted">Log in to pick up where you left off.</p>
+</div>
+
+<EditForm Model="model" OnValidSubmit="LogIn" novalidate class="flex flex-col gap-6">
+    <DataAnnotationsValidator />
+    <div class="flex flex-col gap-4">
+        <TextField Id="email" Label="Email" InputType="email" Placeholder="student@example.com" AutoComplete="email" @bind-Value="model.Email" />
+        <TextField Id="password" Label="Password" Password AutoComplete="current-password" @bind-Value="model.Password" />
+    </div>
+    <Button Type="submit" Class="w-full">Log in</Button>
+</EditForm>
+
+<hr class="border-line" />
+
+<div class="flex flex-col items-center gap-3 text-small">
+    <p>
+        <span class="text-muted">New to Pokus?</span>
+        <a href="register" class="font-semibold text-accent hover:underline">Create an account</a>
+    </p>
+    <a href="techniques" class="font-semibold text-accent hover:underline">Browse techniques without an account</a>
+</div>
+
+<p class="flex items-start gap-2 rounded-md bg-sunken px-3 py-2.5 text-small text-muted">
+    <Icon Name="info" Size="16" Class="mt-0.5" />
+    Accounts arrive in a later version. For now, logging in just opens the app and nothing is stored.
+</p>
+
+@code {
+    private readonly LoginModel model = new();
+
+    private void LogIn() => Navigation.NavigateTo("");
+
+    private sealed class LoginModel
+    {
+        [Required(ErrorMessage = "Enter your email.")]
+        [EmailAddress(ErrorMessage = "That doesn't look like an email address.")]
+        public string? Email { get; set; }
+
+        [Required(ErrorMessage = "Enter your password.")]
+        public string? Password { get; set; }
+    }
+}

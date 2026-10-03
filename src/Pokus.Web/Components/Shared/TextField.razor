@@ -1,0 +1,40 @@
+@using System.Linq.Expressions
+
+@* Labelled text input for use inside an EditForm. Use with @bind-Value. Password fields get a show/hide toggle. *@
+<div class="flex flex-col gap-1.5">
+    <label for="@Id" class="text-small font-semibold">@Label</label>
+    <div class="relative">
+        <InputText id="@Id" type="@(Password && !reveal ? "password" : InputType)"
+                   Value="@Value" ValueChanged="@ValueChanged" ValueExpression="@ValueExpression"
+                   placeholder="@Placeholder" autocomplete="@AutoComplete" aria-describedby="@(Hint is null ? null : $"{Id}-hint")"
+                   class="@($"w-full rounded-md border border-line-strong bg-surface px-3 py-2.5 text-body text-ink placeholder:text-subtle focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-soft aria-invalid:border-danger {(Password ? "pr-16" : "")}")" />
+        @if (Password)
+        {
+            <button type="button" @onclick="() => reveal = !reveal" aria-pressed="@(reveal ? "true" : "false")"
+                    class="absolute inset-y-1 right-1 rounded-sm px-2.5 text-small font-semibold text-accent hover:bg-accent-soft">
+                @(reveal ? "Hide" : "Show")
+            </button>
+        }
+    </div>
+    @if (Hint is not null)
+    {
+        <p id="@($"{Id}-hint")" class="text-small text-muted">@Hint</p>
+    }
+    <ValidationMessage For="@ValueExpression" />
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Id { get; set; } = "";
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string InputType { get; set; } = "text";
+    [Parameter] public bool Password { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? AutoComplete { get; set; }
+    [Parameter] public string? Hint { get; set; }
+
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    private bool reveal;
+}
