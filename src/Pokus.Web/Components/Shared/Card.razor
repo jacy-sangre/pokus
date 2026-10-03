@@ -1,0 +1,10 @@
+@* Surface card: 16 px padding, 16 px radius, default border. Pass Class to change gap or padding. *@
+<section class="@($"flex flex-col rounded-lg border border-line bg-surface {Class ?? "gap-3.5 p-4"}")" @attributes="AdditionalAttributes">
+    @ChildContent
+</section>
+
+@code {
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

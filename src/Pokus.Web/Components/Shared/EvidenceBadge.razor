@@ -1,0 +1,44 @@
+@* Evidence level as glyph + text, so it never relies on colour alone.
+   Shapes: filled = research-supported, dot-in-ring = commonly used, diamond = heuristic, half = mixed. *@
+<span class="@($"inline-flex items-center gap-1.5 rounded-full py-[3px] pr-2.5 pl-2 text-small font-semibold whitespace-nowrap {Colors}")">
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
+        @switch (Level)
+        {
+            case EvidenceLevel.ResearchSupported:
+                <circle cx="8" cy="8" r="6" fill="currentColor" />
+                break;
+            case EvidenceLevel.CommonlyUsed:
+                <circle cx="8" cy="8" r="5.25" stroke="currentColor" stroke-width="1.5" fill="none" />
+                <circle cx="8" cy="8" r="2" fill="currentColor" />
+                break;
+            case EvidenceLevel.PracticalHeuristic:
+                <path d="M8 2.5 13.5 8 8 13.5 2.5 8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none" />
+                break;
+            default:
+                <circle cx="8" cy="8" r="5.25" stroke="currentColor" stroke-width="1.5" fill="none" />
+                <path d="M8 2.75a5.25 5.25 0 0 0 0 10.5z" fill="currentColor" />
+                break;
+        }
+    </svg>
+    @Label(Level)
+</span>
+
+@code {
+    [Parameter, EditorRequired] public EvidenceLevel Level { get; set; }
+
+    public static string Label(EvidenceLevel level) => level switch
+    {
+        EvidenceLevel.ResearchSupported => "Research-supported",
+        EvidenceLevel.CommonlyUsed => "Commonly used",
+        EvidenceLevel.PracticalHeuristic => "Practical heuristic",
+        _ => "Mixed evidence",
+    };
+
+    private string Colors => Level switch
+    {
+        EvidenceLevel.ResearchSupported => "bg-ev-rs-bg text-ev-rs",
+        EvidenceLevel.CommonlyUsed => "bg-ev-cu-bg text-ev-cu",
+        EvidenceLevel.PracticalHeuristic => "bg-ev-ph-bg text-ev-ph",
+        _ => "bg-ev-ml-bg text-ev-ml",
+    };
+}

@@ -1,9 +1,247 @@
 @page "/"
+@implements IDisposable
+@inject IFocusService Focus
+@inject IDeckService Decks
+@inject ITechniqueService Techniques
+@inject IMessageService Messages
+@inject ISettingsService Settings
+@inject TimeProvider Clock
 
 <PageTitle>Home · Pokus</PageTitle>
 
-<div class="flex max-w-2xl flex-col gap-1.5">
-    <p class="text-eyebrow uppercase text-muted">Pokus</p>
-    <h1 class="text-display">Find a technique that fits. Start focusing. Actually learn.</h1>
-    <p class="text-muted">The dashboard is on its way. Use the menu to look around.</p>
+<div class="flex flex-col gap-8">
+    <header class="flex flex-col gap-1.5">
+        <p class="text-eyebrow uppercase text-muted">@Now.ToString("dddd, d MMMM", Invariant)</p>
+        <h1 class="text-display">@GreetingHeadline</h1>
+        @if (GreetingSubline is not null)
+        {
+            <p class="text-muted">@GreetingSubline</p>
+        }
+    </header>
+
+    <nav aria-label="Quick start" class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        @foreach (var tile in QuickStart)
+        {
+            <a href="@tile.Href"
+               class="@($"flex flex-col gap-5 rounded-lg p-4 transition-colors {(tile.Primary ? "bg-accent text-on-accent hover:bg-accent-hover" : "border border-line bg-surface hover:border-line-strong")}")">
+                <Icon Name="@tile.Icon" Size="22" Class="@(tile.Primary ? "" : "text-accent")" />
+                <span class="flex flex-col gap-0.5">
+                    <span class="font-semibold">@tile.Title</span>
+                    <span class="@($"text-small {(tile.Primary ? "" : "text-muted")}")">@tile.Meta</span>
+                </span>
+            </a>
+        }
+    </nav>
+
+    <div class="flex flex-col gap-6 xl:flex-row xl:items-start">
+        <div class="flex min-w-0 flex-1 flex-col gap-6">
+            @if (Focus.Current is { } session)
+            {
+                var remaining = session.Remaining(Now);
+                <Card>
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="flex items-center gap-2 text-small font-semibold text-accent">
+                            <span class="size-2 rounded-full bg-accent" aria-hidden="true"></span>
+                            @(remaining > TimeSpan.Zero ? "In progress" : "Focus phase done")
+                        </span>
+                        <span class="text-small text-muted">@(Techniques.Find(session.TechniqueSlug)?.Name ?? session.Preset.Name)</span>
+                    </div>
+                    <div class="flex flex-wrap items-end justify-between gap-3">
+                        <div class="flex flex-col gap-0.5">
+                            <p class="text-title-1 tabular-nums">@Clockface(remaining) left</p>
+                            @if (session.Task is not null)
+                            {
+                                <p class="text-small text-muted">@session.Task</p>
+                            }
+                        </div>
+                        <Button Kind="Button.Kinds.Secondary" Href="focus/session">Return to session</Button>
+                    </div>
+                    <ProgressBar Value="session.Progress(Now)" Label="Focus phase progress" />
+                </Card>
+            }
+
+            @if (totalDue > 0)
+            {
+                <Card Class="gap-3 p-4">
+                    <div class="flex items-start gap-2.5">
+                        <span class="flex h-6 items-center text-break"><Icon Name="cards" /></span>
+                        <p class="font-semibold">@DueMessage</p>
+                    </div>
+                    <ul>
+                        @foreach (var deck in dueDecks)
+                        {
+                            <li class="flex items-center justify-between gap-3 border-b border-line py-2.5 last:border-b-0">
+                                <span>@deck.Name</span>
+                                <DuePill Count="deck.DueCount(Now)" />
+                            </li>
+                        }
+                    </ul>
+                    <div><Button Href="flashcards/review">Review all due cards</Button></div>
+                </Card>
+            }
+
+            <section class="flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-title-3">Recent sessions</h2>
+                    <a href="focus/history" class="text-small font-semibold text-accent hover:underline">History</a>
+                </div>
+                <Card Class="px-4 py-1">
+                    @foreach (var s in Focus.History.Take(3))
+                    {
+                        <div class="flex items-center gap-3 border-b border-line py-2.5 last:border-b-0">
+                            <div class="flex min-w-0 flex-1 flex-col">
+                                <span>@s.Task</span>
+                                <span class="text-small text-muted">@(Techniques.Find(s.TechniqueSlug)?.ShortName) · @WhenLabel(s.StartedAt)</span>
+                            </div>
+                            <span class="font-semibold whitespace-nowrap">@((int)Math.Round(s.Elapsed(Now).TotalMinutes)) min</span>
+                        </div>
+                    }
+                </Card>
+            </section>
+        </div>
+
+        <div class="flex flex-col gap-6 xl:w-[360px] xl:shrink-0">
+            <Card Class="gap-[18px] p-4">
+                <div class="flex items-end justify-between gap-3">
+                    <div class="flex flex-col gap-0.5">
+                        <p class="text-eyebrow uppercase text-muted">This week</p>
+                        <p class="text-title-2">@Duration(weekMinutes.Sum()) focused</p>
+                    </div>
+                    <p class="text-small text-muted">@Decks.ReviewedThisWeek() cards reviewed</p>
+                </div>
+                <WeekBars Values="weekMinutes" Today="Week.TodayIndex(Now)" MaxHeight="96"
+                          Summary="@($"Focus minutes this week, Monday to Sunday: {string.Join(", ", weekMinutes)}")" />
+            </Card>
+
+            <section class="flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-title-3">Your techniques</h2>
+                    <a href="techniques" class="text-small font-semibold text-accent hover:underline">Library</a>
+                </div>
+                <div class="flex flex-col gap-2">
+                    @foreach (var t in yourTechniques)
+                    {
+                        var favorite = Techniques.IsFavorite(t.Slug);
+                        <a href="@($"techniques/{t.Slug}")"
+                           class="flex items-center gap-3 rounded-xl border border-line bg-surface px-3.5 py-3 transition-colors hover:border-line-strong">
+                            <span class="flex min-w-0 flex-1 flex-col gap-1.5">
+                                <span class="font-semibold">@t.Name</span>
+                                <span class="flex flex-wrap items-center gap-2">
+                                    <EvidenceBadge Level="t.Evidence" />
+                                    <span class="text-small text-muted">@t.SessionLength</span>
+                                </span>
+                            </span>
+                            @if (favorite)
+                            {
+                                <Icon Name="star-filled" Size="18" Class="text-accent" />
+                                <span class="sr-only">Favorite</span>
+                            }
+                            else
+                            {
+                                <Icon Name="chevron-right" Size="18" Class="text-subtle" />
+                            }
+                        </a>
+                    }
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Invariant = System.Globalization.CultureInfo.InvariantCulture;
+
+    private record Tile(string Icon, string Title, string Meta, string Href, bool Primary = false);
+
+    // Kept across prerender and the interactive render so the random message doesn't change on load.
+    [PersistentState] public string? Greeting { get; set; }
+    [PersistentState] public string? DueMessage { get; set; }
+
+    private readonly CancellationTokenSource ticking = new();
+    private int totalDue;
+    private List<Deck> dueDecks = [];
+    private int[] weekMinutes = [];
+    private List<Technique> yourTechniques = [];
+
+    private DateTimeOffset Now => Clock.GetLocalNow();
+
+    private IEnumerable<Tile> QuickStart =>
+    [
+        new("timer", "Start focus", $"{Settings.DefaultPreset.Name} · {Settings.DefaultPreset.FocusMinutes} min", "focus", Primary: true),
+        new("cards", "Review cards", totalDue > 0 ? $"{totalDue} waiting" : "Nothing due", "flashcards/review"),
+        new("compass", "Find a technique", "8 situations", "find"),
+        new("plus", "New flashcards", "Manual or from notes", "flashcards"),
+    ];
+
+    // The greeting's first sentence is the headline; the rest becomes the line under it.
+    private string GreetingHeadline => SplitGreeting().Headline;
+    private string? GreetingSubline => SplitGreeting().Subline;
+
+    protected override void OnInitialized()
+    {
+        var now = Now;
+        totalDue = Decks.TotalDue();
+        dueDecks = Decks.Decks.Where(d => d.DueCount(now) > 0).ToList();
+        weekMinutes = Focus.MinutesThisWeek();
+
+        // Favorites first, then recently used techniques.
+        yourTechniques = Techniques.Favorites()
+            .Concat(Focus.History.Select(s => Techniques.Find(s.TechniqueSlug)).OfType<Technique>())
+            .DistinctBy(t => t.Slug)
+            .Take(3)
+            .ToList();
+
+        Greeting ??= Messages.Pick(MessageCategory.DashboardGreeting);
+        DueMessage ??= Messages.Pick(MessageCategory.CardsDue, totalDue);
+
+        if (Focus.Current is not null) _ = TickAsync();
+    }
+
+    // Re-render once a second so the running session counts down. Time itself comes from timestamps.
+    private async Task TickAsync()
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(ticking.Token))
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private (string Headline, string? Subline) SplitGreeting()
+    {
+        var text = Greeting ?? "";
+        var end = text.IndexOfAny(['.', '!', '?']);
+        if (end < 0 || end == text.Length - 1) return (text, null);
+        // Keep "(It's not.)"-style asides with the second line.
+        return (text[..(end + 1)], text[(end + 1)..].Trim());
+    }
+
+    private static string Clockface(TimeSpan t) =>
+        t.TotalHours >= 1 ? t.ToString(@"h\:mm\:ss") : t.ToString(@"mm\:ss");
+
+    private static string Duration(int minutes) =>
+        minutes >= 60 ? $"{minutes / 60}h {minutes % 60}m" : $"{minutes}m";
+
+    private string WhenLabel(DateTimeOffset at)
+    {
+        var days = (Now.Date - at.Date).Days;
+        return days switch
+        {
+            0 => $"Today, {at:HH:mm}",
+            1 => "Yesterday",
+            _ => at.ToString("ddd", Invariant),
+        };
+    }
+
+    public void Dispose()
+    {
+        ticking.Cancel();
+        ticking.Dispose();
+    }
+}

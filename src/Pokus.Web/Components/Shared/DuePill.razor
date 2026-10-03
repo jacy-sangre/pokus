@@ -1,0 +1,8 @@
+<span class="inline-flex items-center gap-1.5 rounded-full bg-break-soft py-0.5 pr-2.5 pl-2 text-small font-semibold whitespace-nowrap text-break">
+    <span class="size-1.5 rounded-full bg-break" aria-hidden="true"></span>
+    @Count due
+</span>
+
+@code {
+    [Parameter, EditorRequired] public int Count { get; set; }
+}

@@ -1,0 +1,22 @@
+@* Small bar chart: one bar per label. Today's bar is accent, past bars soft, future bars a flat stub. *@
+<div class="flex items-end gap-2" role="img" aria-label="@Summary">
+    @for (var i = 0; i < Values.Count; i++)
+    {
+        var future = i > Today;
+        var height = future ? 4 : Math.Max(4, (int)Math.Round(Values[i] / (double)Max * MaxHeight));
+        <div class="flex flex-1 flex-col items-center gap-1.5">
+            <div class="@($"w-full rounded-[4px] {(future ? "bg-sunken" : i == Today ? "bg-accent" : "bg-accent-soft")}")" style="height: @(height)px"></div>
+            <span class="@($"text-small {(i == Today ? "font-semibold text-ink" : "text-muted")}")">@Labels[i]</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<int> Values { get; set; } = [];
+    [Parameter] public IReadOnlyList<string> Labels { get; set; } = ["M", "T", "W", "T", "F", "S", "S"];
+    [Parameter] public int Today { get; set; }
+    [Parameter] public int MaxHeight { get; set; } = 72;
+    [Parameter] public string? Summary { get; set; }
+
+    private int Max => Math.Max(1, Values.Count == 0 ? 1 : Values.Max());
+}
