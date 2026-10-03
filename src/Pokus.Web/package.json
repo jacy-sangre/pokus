@@ -1,0 +1,13 @@
+{
+  "name": "pokus-web",
+  "private": true,
+  "description": "Tailwind CSS build for the Pokus Blazor app",
+  "scripts": {
+    "css:build": "tailwindcss -i ./Styles/app.css -o ./wwwroot/app.css --minify",
+    "css:watch": "tailwindcss -i ./Styles/app.css -o ./wwwroot/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

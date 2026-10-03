@@ -1,0 +1,17 @@
+@inherits LayoutComponentBase
+
+<div class="min-h-screen bg-canvas lg:flex">
+    <NavMenu />
+
+    <main class="min-w-0 flex-1 px-4 pt-6 pb-12 sm:px-8 lg:px-14 lg:pt-10 lg:pb-16">
+        @Body
+    </main>
+</div>
+
+@* Blazor shows this bar (by setting display: block) when an unhandled error occurs. *@
+<div id="blazor-error-ui" data-nosnippet
+     class="fixed inset-x-0 bottom-0 z-50 hidden items-center gap-4 bg-break-soft px-5 py-3 text-body text-ink shadow-e2">
+    An unhandled error has occurred.
+    <a href="." class="reload font-semibold text-accent underline">Reload</a>
+    <button type="button" class="dismiss absolute top-2 right-3 cursor-pointer text-muted" aria-label="Dismiss">✕</button>
+</div>

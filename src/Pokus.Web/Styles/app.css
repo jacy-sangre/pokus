@@ -1,0 +1,170 @@
+/*
+  Tailwind entry point. Built to wwwroot/app.css by `npm run css:build`
+  (the build runs automatically before `dotnet build`).
+
+  Colour values come from the Figma design tokens. They live in CSS variables so the
+  dark theme only swaps values; the Tailwind utilities (bg-canvas, text-muted, ...) stay the same.
+*/
+@import "tailwindcss";
+
+@source "../Components";
+
+/* ---------- Design tokens: light (default) ---------- */
+:root {
+  --pk-canvas: #F4F1EA;
+  --pk-surface: #FDFCF8;
+  --pk-sunken: #ECE8DF;
+  --pk-ink: #1A1D1B;
+  --pk-muted: #4F5652;
+  --pk-subtle: #676D69;
+  --pk-line: #E2DDD2;
+  --pk-line-strong: #CFC8BA;
+  --pk-accent: #2E5E4E;
+  --pk-accent-hover: #244B3E;
+  --pk-on-accent: #F4F1EA;
+  --pk-accent-soft: #DCE8E1;
+  --pk-break: #8A5D14;
+  --pk-break-soft: #F3E6CC;
+  --pk-danger: #B23A2B;
+  --pk-ev-rs: #2E5E4E;
+  --pk-ev-rs-bg: #DCE8E1;
+  --pk-ev-cu: #37537A;
+  --pk-ev-cu-bg: #E0E7F1;
+  --pk-ev-ph: #8A5A12;
+  --pk-ev-ph-bg: #F3E6CC;
+  --pk-ev-ml: #6B6259;
+  --pk-ev-ml-bg: #EAE5DD;
+  color-scheme: light;
+}
+
+/* ---------- Design tokens: dark ---------- */
+[data-theme="dark"] {
+  --pk-canvas: #121513;
+  --pk-surface: #1A1E1C;
+  --pk-sunken: #0E1110;
+  --pk-ink: #ECE8E0;
+  --pk-muted: #A7ADA8;
+  --pk-subtle: #868D88;
+  --pk-line: #2A302D;
+  --pk-line-strong: #3A413D;
+  --pk-accent: #8CC2AC;
+  --pk-accent-hover: #A5D3BF;
+  --pk-on-accent: #0F1A15;
+  --pk-accent-soft: #1F3029;
+  --pk-break: #E0B266;
+  --pk-break-soft: #33291A;
+  --pk-danger: #E57A6A;
+  --pk-ev-rs: #8CC2AC;
+  --pk-ev-rs-bg: #1F3029;
+  --pk-ev-cu: #9DB6DB;
+  --pk-ev-cu-bg: #1E2735;
+  --pk-ev-ph: #E0B266;
+  --pk-ev-ph-bg: #33291A;
+  --pk-ev-ml: #B9AFA4;
+  --pk-ev-ml-bg: #2A2622;
+  color-scheme: dark;
+}
+
+/* ---------- Tailwind theme ---------- */
+@theme inline {
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: var(--pk-canvas);
+  --color-surface: var(--pk-surface);
+  --color-sunken: var(--pk-sunken);
+  --color-ink: var(--pk-ink);
+  --color-muted: var(--pk-muted);
+  --color-subtle: var(--pk-subtle);
+  --color-line: var(--pk-line);
+  --color-line-strong: var(--pk-line-strong);
+  --color-accent: var(--pk-accent);
+  --color-accent-hover: var(--pk-accent-hover);
+  --color-on-accent: var(--pk-on-accent);
+  --color-accent-soft: var(--pk-accent-soft);
+  --color-break: var(--pk-break);
+  --color-break-soft: var(--pk-break-soft);
+  --color-danger: var(--pk-danger);
+  --color-ev-rs: var(--pk-ev-rs);
+  --color-ev-rs-bg: var(--pk-ev-rs-bg);
+  --color-ev-cu: var(--pk-ev-cu);
+  --color-ev-cu-bg: var(--pk-ev-cu-bg);
+  --color-ev-ph: var(--pk-ev-ph);
+  --color-ev-ph-bg: var(--pk-ev-ph-bg);
+  --color-ev-ml: var(--pk-ev-ml);
+  --color-ev-ml-bg: var(--pk-ev-ml-bg);
+}
+
+@theme {
+  /* Type scale (Figma text styles). Strong variants add font-semibold. */
+  --text-display: 2.5rem;
+  --text-display--line-height: 2.75rem;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 600;
+  --text-title-1: 1.75rem;
+  --text-title-1--line-height: 2.125rem;
+  --text-title-1--letter-spacing: -0.015em;
+  --text-title-1--font-weight: 600;
+  --text-title-2: 1.25rem;
+  --text-title-2--line-height: 1.75rem;
+  --text-title-2--letter-spacing: -0.01em;
+  --text-title-2--font-weight: 600;
+  --text-title-3: 1.0625rem;
+  --text-title-3--line-height: 1.5rem;
+  --text-title-3--letter-spacing: -0.005em;
+  --text-title-3--font-weight: 600;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.25rem;
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1rem;
+  --text-eyebrow--letter-spacing: 0.06em;
+  --text-eyebrow--font-weight: 600;
+  --text-timer: 4rem;
+  --text-timer--line-height: 4rem;
+  --text-timer--letter-spacing: -0.03em;
+  --text-timer--font-weight: 600;
+
+  /* Radii: sm 6, md 10, lg 16 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Elevation */
+  --shadow-e1: 0 1px 2px rgb(26 31 28 / 0.06), 0 1px 1px rgb(26 31 28 / 0.04);
+  --shadow-e2: 0 1px 2px rgb(26 31 28 / 0.05), 0 12px 28px -10px rgb(26 31 28 / 0.14);
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    @apply bg-canvas text-ink font-sans text-body antialiased;
+  }
+
+  /* FocusOnNavigate moves focus to the page h1; it should not draw a ring. */
+  h1:focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Blazor renders this class itself when a component throws inside an ErrorBoundary. */
+@layer components {
+  .blazor-error-boundary {
+    @apply rounded-md bg-danger p-4 text-on-accent;
+  }
+
+  .blazor-error-boundary::after {
+    content: "Something broke on this part of the page.";
+  }
+}

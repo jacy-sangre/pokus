@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+  </PropertyGroup>
+
+  <!-- Build Tailwind (Styles/app.css -> wwwroot/app.css) before the static assets are collected. -->
+  <Target Name="BuildTailwind" BeforeTargets="BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="npm install" Condition="!Exists('node_modules')" />
+    <Exec Command="npm run css:build" />
+  </Target>
+
+</Project>

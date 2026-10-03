@@ -1,0 +1,68 @@
+@implements IDisposable
+@inject NavigationManager Navigation
+
+@* Desktop: fixed 240 px sidebar. Below lg: a top bar with a menu button that opens the same links. *@
+<header class="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-surface px-4 py-3 lg:hidden">
+    <a href="" aria-label="Pokus home"><Wordmark /></a>
+    <button type="button" @onclick="ToggleMenu" aria-expanded="@(menuOpen ? "true" : "false")" aria-controls="app-nav"
+            class="inline-flex size-10 items-center justify-center rounded-md text-ink hover:bg-sunken">
+        <Icon Name="@(menuOpen ? "x" : "menu")" />
+        <span class="sr-only">@(menuOpen ? "Close menu" : "Open menu")</span>
+    </button>
+</header>
+
+@if (menuOpen)
+{
+    <div class="fixed inset-0 z-30 bg-ink/30 lg:hidden" @onclick="CloseMenu" aria-hidden="true"></div>
+}
+
+<nav id="app-nav" aria-label="Main"
+     class="@($"fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-1 border-r border-line bg-surface px-4 py-6 transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 {(menuOpen ? "translate-x-0" : "-translate-x-full")}")">
+    <a href="" class="mb-7 px-3" aria-label="Pokus home"><Wordmark /></a>
+
+    @foreach (var item in Items)
+    {
+        <NavLink href="@item.Href" Match="@(item.Href == "" ? NavLinkMatch.All : NavLinkMatch.Prefix)" ActiveClass="active"
+                 class="flex items-center gap-3 rounded-md px-3 py-[9px] text-body text-muted hover:bg-sunken hover:text-ink [&.active]:bg-accent-soft [&.active]:font-semibold [&.active]:text-accent">
+            <Icon Name="@item.Icon" />
+            <span>@item.Label</span>
+        </NavLink>
+    }
+
+    <div class="mt-auto border-t border-line px-3 pt-4">
+        <NavLink href="login" class="text-small font-semibold text-muted hover:text-accent">Log in</NavLink>
+    </div>
+</nav>
+
+@code {
+    private record NavItem(string Label, string Icon, string Href);
+
+    private static readonly NavItem[] Items =
+    [
+        new("Home", "home", ""),
+        new("Techniques", "book", "techniques"),
+        new("Find a technique", "compass", "find"),
+        new("Focus", "timer", "focus"),
+        new("Flashcards", "cards", "flashcards"),
+        new("Insights", "chart", "insights"),
+        new("Settings", "sliders", "settings"),
+    ];
+
+    private bool menuOpen;
+
+    protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
+
+    private void ToggleMenu() => menuOpen = !menuOpen;
+
+    private void CloseMenu() => menuOpen = false;
+
+    // Close the mobile drawer after a link is followed.
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (!menuOpen) return;
+        menuOpen = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

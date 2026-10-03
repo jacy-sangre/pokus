@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # macOS
 .DS_Store
+
+# Tailwind output (generated from src/Pokus.Web/Styles/app.css on build)
+src/Pokus.Web/wwwroot/app.css

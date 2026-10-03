@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Pokus.Web/Pokus.Web.csproj" />
+  </Folder>
+</Solution>

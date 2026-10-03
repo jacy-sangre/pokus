@@ -1,0 +1,32 @@
+<script type="module" src="@Assets["Components/Layout/ReconnectModal.razor.js"]"></script>
+
+@* Blazor adds components-reconnect-* state classes to the dialog; group-[...] variants show the matching line. *@
+<dialog id="components-reconnect-modal" data-nosnippet
+        class="group m-auto w-80 rounded-lg border-0 bg-surface p-8 text-center text-body text-ink shadow-e2 backdrop:bg-ink/40">
+    <div class="flex flex-col items-center gap-4">
+        <div class="hidden size-10 animate-spin rounded-full border-4 border-accent-soft border-t-accent group-[.components-reconnect-show]:block group-[.components-reconnect-retrying]:block" aria-hidden="true"></div>
+        <p class="hidden group-[.components-reconnect-show]:block">
+            Rejoining the server...
+        </p>
+        <p class="hidden group-[.components-reconnect-retrying]:block">
+            Rejoin failed... trying again in <span id="components-seconds-to-next-attempt"></span> seconds.
+        </p>
+        <p class="hidden group-[.components-reconnect-failed]:block">
+            Failed to rejoin.<br />Please retry or reload the page.
+        </p>
+        <button id="components-reconnect-button"
+                class="hidden rounded-md bg-accent px-4.5 py-2.5 font-semibold text-on-accent hover:bg-accent-hover group-[.components-reconnect-failed]:block">
+            Retry
+        </button>
+        <p class="hidden group-[.components-reconnect-paused]:block">
+            The session has been paused by the server.
+        </p>
+        <p class="hidden group-[.components-reconnect-resume-failed]:block">
+            Failed to resume the session.<br />Please retry or reload the page.
+        </p>
+        <button id="components-resume-button"
+                class="hidden rounded-md bg-accent px-4.5 py-2.5 font-semibold text-on-accent hover:bg-accent-hover group-[.components-reconnect-paused]:block group-[.components-reconnect-resume-failed]:block">
+            Resume
+        </button>
+    </div>
+</dialog>
