@@ -3,12 +3,14 @@ namespace Pokus.Web.Domain;
 public sealed class Subject
 {
     public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
     public required string Name { get; set; }
 }
 
 public sealed class Deck
 {
     public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
     public Guid? SubjectId { get; set; }
     public required string Name { get; set; }
     public bool UseSpacedRepetition { get; set; } = true;

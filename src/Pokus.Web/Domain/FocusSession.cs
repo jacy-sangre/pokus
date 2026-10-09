@@ -16,6 +16,7 @@ public sealed record FocusPreset(string Key, string Name, int FocusMinutes, int 
 public sealed class FocusSession
 {
     public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
     public required FocusPreset Preset { get; init; }
     public string? TechniqueSlug { get; init; }
     public string? Task { get; set; }
